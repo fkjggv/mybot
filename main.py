@@ -142,5 +142,15 @@ app = ApplicationBuilder().token(TOKEN).build()
 async def reply(update, context):
     await update.message.reply_text("هلا بيك 👋")
 
-app.add_handler(MessageHandler(filters.TEXT, reply))
+async def reply(update, context):
+    text = update.message.text
+
+    if text == "هلا":
+        await update.message.reply_text("هلا بيك 👋")
+
+    elif text == "ايدي":
+        await update.message.reply_text(str(update.message.from_user.id))
+
+    elif text == "احكام":
+        await update.message.reply_text("🎯 لعبة احكام شغالة")
 app.run_polling()
