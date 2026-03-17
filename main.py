@@ -52,6 +52,7 @@ app.add_handler(CommandHandler("ahkam", ahkam))
 print("Bot is running... 🚀")
 
 app.run_polling() 
+from telegram.ext import MessageHandler, filters
 replies = {}
 waiting = {}
 
@@ -83,3 +84,5 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # الرد التلقائي
     if text in replies:
         await update.message.reply_text(replies[text])
+        app.add_handler(CommandHandler("add", add_reply))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
