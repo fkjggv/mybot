@@ -21,7 +21,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ---------------- لعبة عشوائية ----------------
-async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+
+    if "خالد" in text:
+        await update.message.reply_text("اهلا تفضل شتريد من المطور؟ @F0o_0o")
+    
     games = [
         "🎯 تحدي: اكتب اسمك مقلوب!",
         "😂 قول نكتة تضحك الكل",
