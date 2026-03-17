@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import random
 
 # جلب التوكن من Railway
-TOKEN = os.getenv("TOKEN")
+TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg"
 
 if not TOKEN:
     raise ValueError("TOKEN NOT FOUND ❌ تأكد من Variables")
