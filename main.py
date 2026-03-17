@@ -135,7 +135,10 @@ async def h(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     if t=="نكته":
         return await m.reply_text(random.choice(jokes)) 
-if t=="كت":
+if t=="نكته":
+        return await m.reply_text(random.choice(jokes))
+
+    if t=="كت":
         return await m.reply_text(random.choice(questions))
 
     if t=="لو خيروك":
@@ -143,6 +146,15 @@ if t=="كت":
 
     # ===== احكام =====
     if t=="احكام":
+        members=[]
+        async for member in context.bot.get_chat_administrators(m.chat.id):
+            members.append(member.user)
+
+        if len(members)<2:
+            return await m.reply_text("❌ لازم اكثر من ادمن")
+
+        p1,p2=random.sample(members,2)
+        return await m.reply_text(f"👑 الحاكم: {p1.first_name}\n😈 المحكوم: {p2.first_name}")
         members=[]
         async for member in context.bot.get_chat_administrators(m.chat.id):
             members.append(member.user)
