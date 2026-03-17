@@ -27,13 +27,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if "خالد" in text:
         await update.message.reply_text("اهلا تفضل شتريد من المطور؟ @F0o_0o")
     
-    games = [
-        "🎯 تحدي: اكتب اسمك مقلوب!",
-        "😂 قول نكتة تضحك الكل",
-        "🔥 قول سر ماحد يعرفه",
-        "🎤 غني سطر من أغنية",
-        "📸 صور شي قريب منك"
-    ]
     await update.message.reply_text(random.choice(games))
 
 # ---------------- لعبة أحكام ----------------
