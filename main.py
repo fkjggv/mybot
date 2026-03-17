@@ -51,4 +51,35 @@ app.add_handler(CommandHandler("ahkam", ahkam))
 
 print("Bot is running... 🚀")
 
-app.run_polling()
+app.run_polling() 
+replies = {}
+waiting = {}
+
+# بدء إضافة رد
+async def add_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    waiting[user_id] = "word"
+    await update.message.reply_text("✏️ ارسل الكلمة اللي تريد تضيف لها رد")
+
+# استقبال الرسائل
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    text = update.message.text
+
+    # مرحلة اختيار الكلمة
+    if user_id in waiting and waiting[user_id] == "word":
+        waiting[user_id] = text
+        await update.message.reply_text("💬 ارسل الرد اللي تريده")
+        return
+
+    # مرحلة الرد
+    if user_id in waiting and waiting[user_id] != "word":
+        key = waiting[user_id]
+        replies[key] = text
+        del waiting[user_id]
+        await update.message.reply_text("✅ تم إضافة الرد بنجاح")
+        return
+
+    # الرد التلقائي
+    if text in replies:
+        await update.message.reply_text(replies[text])
