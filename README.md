@@ -2,108 +2,132 @@ import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg"
+TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg" 
 OWNER_ID = 8203532937
-
-print("BOT WORKING")
 
 app = ApplicationBuilder().token(TOKEN).build()
 
+# ===== تخزين =====
 games = {}
+replies = {}
+roles = {}
+
+# ===== رتب =====
+RANKS = ["مميز", "ادمن", "مدير", "مالك", "مالك اساسي"]
+
+def get_rank(user_id):
+    if user_id == OWNER_ID:
+        return "مالك اساسي"
+    return roles.get(user_id, "عضو")
 
 # ===== نكت =====
-jokes = [f"😂 نكتة رقم {i}" for i in range(1,26)]
-
-# ===== كت =====
-questions_game = [f"🤔 سؤال كت رقم {i}" for i in range(1,26)]
+jokes = [
+"مرة واحد بخيل حلم حلم عطى صدقة، صحى زعل 😂",
+"محشش فتح محل سماه (مغلق للتطوير) 🤣",
+"واحد غبي وقع من الدرج راح يكمل نزول من المصعد 😂",
+"في واحد نام متأخر... فاته الحلم 🤣",
+"مرة دجاجة ضحكت طلع بيضها مخفوق 😂",
+"واحد راح يشتري عقل قالوله خلص 🤣",
+"محشش سأل أبوه: انت ابوي؟ قاله لا جاركم 😂",
+"واحد اشترى ساعة تأخرت عليه 🤣",
+"في واحد ضحك... وقع 😂",
+"محشش فتح باب الثلاجة عشان يشوف النور 😂",
+"واحد سرق بنك رجع الفلوس لأنه ندم 🤣",
+"في واحد دخل امتحان بدون دراسة طلع بدون نجاح 😂",
+"محشش راح للدكتور قاله كل ما أشرب شاي عيني توجعني قاله شيل الملعقة 🤣",
+"مرة واحد حب وحدة حبته انصدم 😂",
+"في واحد نام وهو واقف عشان ما يتأخر 🤣",
+"واحد سألوه شتشتغل قالهم أتنفس 😂",
+"في واحد اشترى تلفزيون قعد يشوفه مطفي 🤣",
+"واحد كتب رسالة لنفسه ورد عليها 😂",
+"محشش راح يصلي نسى وين وصل 🤣",
+"في واحد شاف حلم وصدق نفسه 😂",
+"واحد أكل أندومي بدون ماء نشف 🤣",
+"محشش اشترى نظارات شاف الدنيا أوضح خاف 🤣",
+"في واحد طاح من الضحك ما قدر يكمل 😂",
+"واحد دخل مطعم قالهم عندكم أكل؟ قالوا لا مطعم ديكور 🤣",
+"محشش قال لصاحبه تعال نحكي بالهمس بصوت عالي 😂"
+]
 
 # ===== لو خيروك =====
-would_you = [f"😏 لو خيروك رقم {i}" for i in range(1,26)]
+would_you = [
+"😏 لو خيروك تعيش بدون موبايل أو بدون أصدقاء؟",
+"😏 لو خيروك تكون غني وحزين أو فقير وسعيد؟",
+"😏 لو خيروك تسافر للماضي أو المستقبل؟",
+"😏 لو خيروك تعيش بالبحر أو بالفضاء؟",
+"😏 لو خيروك تكون مشهور أو غني؟",
+"😏 لو خيروك تعيش وحدك أو مع ناس مزعجين؟",
+"😏 لو خيروك تحب وما تنحب أو تنحب وما تحب؟",
+"😏 لو خيروك تضحك طول الوقت أو تبچي طول الوقت؟",
+"😏 لو خيروك تكون ذكي أو قوي؟",
+"😏 لو خيروك تسافر كل يوم أو تبقى بمكان واحد؟",
+"😏 لو خيروك تكون قائد أو تابع؟",
+"😏 لو خيروك تعيش بدون انترنت أو بدون تلفزيون؟",
+"😏 لو خيروك تصير مشهور فجأة أو غني فجأة؟",
+"😏 لو خيروك تكون وحيد أو تخسر أصدقاءك؟",
+"😏 لو خيروك تعيش بالماضي أو المستقبل؟",
+"😏 لو خيروك تكون سريع أو قوي؟",
+"😏 لو خيروك تشتغل شغل تحبه أو براتب عالي؟",
+"😏 لو خيروك تروح مدرسة أو تقعد بالبيت؟",
+"😏 لو خيروك تنجح بسهولة أو تتعب وتنجح؟",
+"😏 لو خيروك تكون محبوب أو محترم؟",
+"😏 لو خيروك تعيش حياة مريحة أو مليئة مغامرات؟",
+"😏 لو خيروك تكون غني بدون أصدقاء أو فقير ومعك أصدقاء؟",
+"😏 لو خيروك تحلم طول الوقت أو تعيش الواقع؟",
+"😏 لو خيروك تنسى الماضي أو ما تفكر بالمستقبل؟",
+"😏 لو خيروك تعيش بدون نوم أو بدون أكل؟"
+]
 
-# ===== اسئلة =====
-questions = [f"❓ سؤال عام رقم {i}" for i in range(1,26)]
+# ===== كت =====
+questions_game = [
+"🤔 منو اقرب شخص الك؟",
+"🤔 شنو أكثر شي تخاف منه؟",
+"🤔 شنو حلمك بالمستقبل؟",
+"🤔 شنو اكثر موقف محرج صارلك؟",
+"🤔 شنو اكثر شي تحبه بحياتك؟",
+"🤔 عندك سر محد يعرفه؟",
+"🤔 شنو اكثر شي يزعلك؟",
+"🤔 شنو اكثر شي تكرهه؟",
+"🤔 تحب السفر؟",
+"🤔 منو قدوتك؟",
+"🤔 شنو اكثر شي يسعدك؟",
+"🤔 تحب الوحدة لو التجمع؟",
+"🤔 شنو اكثر شي تفكر بي؟",
+"🤔 عندك صديق مفضل؟",
+"🤔 شنو اكثر شي تخجل منه؟",
+"🤔 تحب المغامرة؟",
+"🤔 شنو اكثر شي تتمناه؟",
+"🤔 شنو اكثر شي ندمت عليه؟",
+"🤔 تحب تغير حياتك؟",
+"🤔 شنو اكثر شي يضحكك؟",
+"🤔 شنو اكثر شي تتمنى يصير؟"
+]
 
-# ===== البوت =====
+# ===== الرد =====
+add_mode = {}
+
 async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     m = update.message
     if not m or not m.text:
         return
 
     user = m.from_user
+    text = m.text
     chat_id = m.chat_id
-    text = m.text.lower()
 
-    # ===== ردود =====
-    if "هلا" in text:
-        return await m.reply_text("هلا بيك 👋")
+    rank = get_rank(user.id)
 
-    if "بوت" in text:
-        return await m.reply_text("اسمي خالد مو بوت 😒")
+    # ===== اضافة رد =====
+    if text == "اضف رد" and rank in ["ادمن","مدير","مالك","مالك اساسي"]:
+        add_mode[user.id] = {"step":1}
+        return await m.reply_text("شنو تريد تضيف؟")
 
-    if "ايدي" in text:
-        return await m.reply_text(f"🆔 {user.id}")
-
-    # ===== عرض الالعاب =====
-    if text == "الالعاب":
-        return await m.reply_text("🎮 نكته / كت / لو خيروك / اسئله / احكام")
-
-    # ===== نكته =====
-    if "نكته" in text:
-        return await m.reply_text(random.choice(jokes))
-
-    # ===== كت =====
-    if "كت" in text:
-        return await m.reply_text(random.choice(questions_game))
-
-    # ===== لو خيروك =====
-    if "لو خيروك" in text:
-        return await m.reply_text(random.choice(would_you))
-
-    # ===== اسئلة =====
-    if "اسئله" in text:
-        return await m.reply_text(random.choice(questions))
-
-    # ===== بدء احكام =====
-    if text == "احكام":
-        games[chat_id] = {
-            "owner": user.id,
-            "players": [user.id]
-        }
-
-        return await m.reply_text(
-            "🎯 تم بدء اللعبة وتم تسجيلك\n\n"
-            "• اللي بيلعب يرسل (انا)"
-        )
-
-    # ===== تسجيل لاعب =====
-    if text == "انا":
-        if chat_id in games:
-            if user.id not in games[chat_id]["players"]:
-                games[chat_id]["players"].append(user.id)
-                return await m.reply_text("✅ تم اضافتك")
-            else:
-                return await m.reply_text("❌ انت مسجل")
-
-    # ===== اختيار =====
-    if text == "نعم":
-        if chat_id in games:
-            if user.id != games[chat_id]["owner"]:
-                return await m.reply_text("❌ بس صاحب اللعبة")
-
-            players = games[chat_id]["players"]
-
-            if len(players) < 2:
-                return await m.reply_text("❌ لازم لاعبين على الاقل")
-
-            p1, p2 = random.sample(players, 2)
-
-            await m.reply_text(
-                f"👑 الحاكم: {p1}\n😈 المحكوم: {p2}"
-            )
-
-            games.pop(chat_id)
-
-# ===== تشغيل =====
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
-
-app.run_polling()
+    if user.id in add_mode:
+        if add_mode[user.id]["step"] == 1:
+            add_mode[user.id]["key"] = text
+            add_mode[user.id]["step"] = 2
+            return await m.reply_text("تمام شنو الرد؟")
+        else:
+            replies[add_mode[user.id]["key"]] = text
+            add_mode.pop(user.id)
+            return await m.reply_text("✅ تم اضافة الرد")
