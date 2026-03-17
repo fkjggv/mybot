@@ -3,7 +3,7 @@ import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-TOKEN = "PUT_YOUR_TOKEN_HERE"
+TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg"
 OWNER_ID = 8203532937
 
 # ===== تحميل =====
