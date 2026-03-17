@@ -138,3 +138,8 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if t == "كت":
         return await m.reply_text(random.choice(questions))
+async def reply(update, context):
+    await update.message.reply_text("هلا بيك 👋")
+
+app.add_handler(MessageHandler(filters.TEXT, reply))
+app.run_polling
