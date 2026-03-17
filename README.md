@@ -1,71 +1,54 @@
+import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import os
 import random
 
-# جلب التوكن من Variables
+# جلب التوكن من Railway
 TOKEN = os.getenv("TOKEN")
 
-players = []
+if not TOKEN:
+    raise ValueError("TOKEN NOT FOUND ❌ تأكد من Variables")
 
-ahkam = [
-    "احكم على لاعب يغير صورته 😂",
-    "احكم على لاعب يكتب رسالة غريبة 😈",
-    "احكم على لاعب يطلع من القروب ويرجع 😅",
-    "احكم على لاعب يمدح شخص عشوائي 💀",
-    "احكم على لاعب يسوي نفسه بنت 😂",
-]
-
-# امر /start (ترحيب)
+# ---------------- ترحيب ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
     await update.message.reply_text(
-        "🔥 هلا بيك ببوت الألعاب!\n\n"
-        "الاوامر:\n"
-        "/join - دخول اللعبة\n"
-        "/players - عرض اللاعبين\n"
-        "/ahkam - بدء لعبة احكام 😈"
+        f"هلا {user.first_name} 👋\n"
+        "نورت البوت ❤️\n\n"
+        "الأوامر:\n"
+        "/game - لعبة عشوائية 🎮\n"
+        "/ahkam - لعبة أحكام 😈"
     )
 
-# دخول اللعبة
-async def join(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user.first_name
+# ---------------- لعبة عشوائية ----------------
+async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    games = [
+        "🎯 تحدي: اكتب اسمك مقلوب!",
+        "😂 قول نكتة تضحك الكل",
+        "🔥 قول سر ماحد يعرفه",
+        "🎤 غني سطر من أغنية",
+        "📸 صور شي قريب منك"
+    ]
+    await update.message.reply_text(random.choice(games))
 
-    if user not in players:
-        players.append(user)
-        await update.message.reply_text(f"✅ {user} دخل اللعبة!")
-    else:
-        await update.message.reply_text("❌ انت داخل اصلاً")
+# ---------------- لعبة أحكام ----------------
+async def ahkam(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    rules = [
+        "😈 الحكم: غير اسمك لمدة ساعة",
+        "🔥 الحكم: دز فويس واغني",
+        "😂 الحكم: اكتب منشور عشوائي",
+        "🎭 الحكم: مثل شخصية مشهورة",
+        "📞 الحكم: اتصل بصديقك وكله احبك 😂"
+    ]
+    await update.message.reply_text(random.choice(rules))
 
-# عرض اللاعبين
-async def show_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not players:
-        await update.message.reply_text("❌ ماكو لاعبين بعد")
-    else:
-        text = "👥 اللاعبين:\n"
-        for p in players:
-            text += f"- {p}\n"
-        await update.message.reply_text(text)
-
-# لعبة احكام
-async def play_ahkam(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if len(players) < 2:
-        await update.message.reply_text("❌ لازم لاعبين على الاقل")
-        return
-
-    chosen = random.choice(players)
-    hokm = random.choice(ahkam)
-
-    await update.message.reply_text(
-        f"🎯 اللاعب: {chosen}\n"
-        f"📜 الحكم: {hokm}"
-    )
-
-# تشغيل البوت
+# ---------------- تشغيل البوت ----------------
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("join", join))
-app.add_handler(CommandHandler("players", show_players))
-app.add_handler(CommandHandler("ahkam", play_ahkam))
+app.add_handler(CommandHandler("game", game))
+app.add_handler(CommandHandler("ahkam", ahkam))
+
+print("Bot is running... 🚀")
 
 app.run_polling()
