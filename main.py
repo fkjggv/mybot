@@ -6,6 +6,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg"
 OWNER_ID = 8203532937
 
+print("BOT WARKING")
 # ===== تحميل =====
 def load(file):
     try:
@@ -137,3 +138,6 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if t == "كت":
         return await m.reply_text(random.choice(questions))
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.run_polling()
