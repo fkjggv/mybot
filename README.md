@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 
 TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg" 
 OWNER_ID = 8203532937
-
+print("BOT WArKIng")
 app = ApplicationBuilder().token(TOKEN).build()
 
 # ===== تخزين =====
