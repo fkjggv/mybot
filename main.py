@@ -131,3 +131,5 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             replies[add_mode[user.id]["key"]] = text
             add_mode.pop(user.id)
             return await m.reply_text("✅ تم اضافة الرد")
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
+app.run_polling()
