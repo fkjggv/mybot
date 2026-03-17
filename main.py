@@ -1,86 +1,100 @@
-import os
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import random
+if u.id in waiting_reply:
+        if waiting_reply[u.id]["step"]==1:
+            waiting_reply[u.id]["word"]=t
+            waiting_reply[u.id]["step"]=2
+            return await m.reply_text("💬 تمام شنو تريد يكون الرد؟")
 
-# جلب التوكن من Railway
-TOKEN = "8629733218:AAHrLdHlSE5pOG505XucG8OsrfgRyAppkbg"
+        elif waiting_reply[u.id]["step"]==2:
+            replies[waiting_reply[u.id]["word"]]=t
+            save("replies.json",replies)
+            del waiting_reply[u.id]
+            return await m.reply_text("✅ تم حفظ الرد")
 
-if not TOKEN:
-    raise ValueError("TOKEN NOT FOUND ❌ تأكد من Variables")
+    # ===== اضافة امر =====
+    if t=="اضف امر":
+        if not is_admin(u.id):
+            return await m.reply_text("❌ للادمن وفوك")
+        waiting_command[u.id]={"step":1}
+        return await m.reply_text("✍️ شنو الامر؟")
 
-# ---------------- ترحيب ----------------
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    await update.message.reply_text(
-        f"هلا {user.first_name} 👋\n"
-        "نورت البوت ❤️\n\n"
-        "الأوامر:\n"
-        "/game - لعبة عشوائية 🎮\n"
-        "/ahkam - لعبة أحكام 😈"
-    )
+    if u.id in waiting_command:
+        if waiting_command[u.id]["step"]==1:
+            waiting_command[u.id]["cmd"]=t
+            waiting_command[u.id]["step"]=2
+            return await m.reply_text("💬 شنو الرد؟")
 
-# ---------------- لعبة عشوائية ----------------
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
+        elif waiting_command[u.id]["step"]==2:
+            commands[waiting_command[u.id]["cmd"]]=t
+            save("commands.json",commands)
+            del waiting_command[u.id]
+            return await m.reply_text("✅ تم حفظ الامر")
 
-    if "خالد" in text:
-        await update.message.reply_text("اهلا تفضل شتريد من المطور؟ @F0o_0o")
-    
-    await update.message.reply_text(random.choice(games))
+    # ===== عرض الاوامر =====
+    if t=="الاوامر":
+        if not commands:
+            return await m.reply_text("ماكو اوامر")
+        msg="📜 الاوامر:\n"
+        for k in commands:
+            msg+=f"- {k}\n"
+        return await m.reply_text(msg)
 
-# ---------------- لعبة أحكام ----------------
-async def ahkam(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    rules = [
-        "😈 الحكم: غير اسمك لمدة ساعة",
-        "🔥 الحكم: دز فويس واغني",
-        "😂 الحكم: اكتب منشور عشوائي",
-        "🎭 الحكم: مثل شخصية مشهورة",
-        "📞 الحكم: اتصل بصديقك وكله احبك 😂"
-    ]
-    await update.message.reply_text(random.choice(rules))
+    # ===== حذف امر =====
+    if t.startswith("حذف امر"):
+        if not is_admin(u.id):
+            return
+        cmd=t.replace("حذف امر","").strip()
+        if cmd in commands:
+            del commands[cmd]
+            save("commands.json",commands)
+            return await m.reply_text("❌ تم حذف الامر")
+        else:
+            return await m.reply_text("مو موجود")
 
-# ---------------- تشغيل البوت ----------------
-app = ApplicationBuilder().token(TOKEN).build()
+    # ===== عرض الردود =====
+    if t=="الردود":
+        if not replies:
+            return await m.reply_text("ماكو ردود")
+        msg="📜 الردود:\n"
+        for k in replies:
+            msg+=f"- {k}\n"
+        return await m.reply_text(msg)
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("game", game))
-app.add_handler(CommandHandler("ahkam", ahkam))
+    # ===== حذف رد =====
+    if t.startswith("حذف رد"):
+        if not is_admin(u.id):
+            return
+        word=t.replace("حذف رد","").strip()
+        if word in replies:
+            del replies[word]
+            save("replies.json",replies)
+            return await m.reply_text("❌ تم حذف الرد")
+        else:
+            return await m.reply_text("مو موجود")
 
-print("Bot is running... 🚀")
+    # ===== تنفيذ الردود =====
+    if t in replies:
+        return await m.reply_text(replies[t])
 
-app.run_polling() 
-from telegram.ext import MessageHandler, filters
-replies = {}
-waiting = {}
+    # ===== تنفيذ الاوامر =====
+    if t in commands:
+        return await m.reply_text(commands[t])
 
-# بدء إضافة رد
-async def add_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    waiting[user_id] = "word"
-    await update.message.reply_text("✏️ ارسل الكلمة اللي تريد تضيف لها رد")
+    # ===== العاب =====
+    if t=="العاب":
+        return await m.reply_text("🎮 كلمات / نكته / لو خيروك / كت / احكام")
 
-# استقبال الرسائل
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    text = update.message.text
+    if t=="نكته":
+        return await m.reply_text(random.choice(jokes))
 
-    # مرحلة اختيار الكلمة
-    if user_id in waiting and waiting[user_id] == "word":
-        waiting[user_id] = text
-        await update.message.reply_text("💬 ارسل الرد اللي تريده")
-        return
+    if t=="كت":
+        return await m.reply_text(random.choice(questions))
 
-    # مرحلة الرد
-    if user_id in waiting and waiting[user_id] != "word":
-        key = waiting[user_id]
-        replies[key] = text
-        del waiting[user_id]
-        await update.message.reply_text("✅ تم إضافة الرد بنجاح")
-        return
+    if t=="لو خيروك":
+        return await m.reply_text(random.choice(would_you))
 
-    # الرد التلقائي
-    if text in replies:
-        await update.message.reply_text(replies[text])
-        app.add_handler(CommandHandler("add", add_reply))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+# ===== تشغيل =====
+app=ApplicationBuilder().token(TOKEN).build()
+app.add_handler(MessageHandler(filters.ALL,h))
+
+print("🔥 BOT FINAL DIRECT TOKEN")
+app.run_polling()
