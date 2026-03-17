@@ -15,14 +15,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if "خالد" in text:
         await update.message.reply_text("اهلا تفضل شتريد من المطور؟ @F0o_0o")
-    user = update.effective_user
-    await update.message.reply_text(
-        f"هلا {user.first_name} 👋\n"
-        "نورت البوت ❤️\n\n"
-        "الأوامر:\n"
-        "/game - لعبة عشوائية 🎮\n"
-        "/ahkam - لعبة أحكام 😈"
-    )
 
 # ---------------- لعبة عشوائية ----------------
 async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
