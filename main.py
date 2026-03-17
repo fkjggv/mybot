@@ -152,5 +152,6 @@ async def reply(update, context):
         await update.message.reply_text(str(update.message.from_user.id))
 
     elif text == "احكام":
-        await update.message.reply_text("🎯 لعبة احكام شغالة")
+        await update.message.reply_text("🎯 لعبة احكام شغالة") 
+app.add_handler(MessageHandler(filters.TEXT, reply))
 app.run_polling()
