@@ -1,79 +1,71 @@
-# mybot
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
 import random
 
+# جلب التوكن من Variables
 TOKEN = os.getenv("TOKEN")
 
 players = []
 
 ahkam = [
-    "سوي مقلب بصديقك 😂",
-    "احچي سر بسيط عنك 🤫",
-    "غنّي مقطع أغنية 🎤",
-    "دز ستيكر مضحك 🤣",
-    "اكتب اسم كراش مالك 😏",
-    "اختار واحد بالمجموعة وامدحه 💙"
+    "احكم على لاعب يغير صورته 😂",
+    "احكم على لاعب يكتب رسالة غريبة 😈",
+    "احكم على لاعب يطلع من القروب ويرجع 😅",
+    "احكم على لاعب يمدح شخص عشوائي 💀",
+    "احكم على لاعب يسوي نفسه بنت 😂",
 ]
 
-# /start
+# امر /start (ترحيب)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user.first_name
-    await update.message.reply_text(f"هلا {user} 👋\nنورت البوت 🤖")
-
-# /help
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "📌 الأوامر:\n"
-        "/start - تشغيل البوت\n"
-        "/help - المساعدة\n"
-        "/join - دخول لعبة الأحكام\n"
-        "/game - بدء اللعبة\n"
-        "/reset - تصفير اللاعبين\n"
+        "🔥 هلا بيك ببوت الألعاب!\n\n"
+        "الاوامر:\n"
+        "/join - دخول اللعبة\n"
+        "/players - عرض اللاعبين\n"
+        "/ahkam - بدء لعبة احكام 😈"
     )
 
-# ترحيب
-async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    for member in update.message.new_chat_members:
-        await update.message.reply_text(f"🎉 هلا {member.first_name} نورت الكروب!")
-
-# دخول لاعب
+# دخول اللعبة
 async def join(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user.first_name
+
     if user not in players:
         players.append(user)
-        await update.message.reply_text(f"{user} دخل اللعبة ✅")
+        await update.message.reply_text(f"✅ {user} دخل اللعبة!")
     else:
-        await update.message.reply_text("أنت داخل مسبقًا 👍")
+        await update.message.reply_text("❌ انت داخل اصلاً")
 
-# بدء اللعبة
-async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# عرض اللاعبين
+async def show_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not players:
+        await update.message.reply_text("❌ ماكو لاعبين بعد")
+    else:
+        text = "👥 اللاعبين:\n"
+        for p in players:
+            text += f"- {p}\n"
+        await update.message.reply_text(text)
+
+# لعبة احكام
+async def play_ahkam(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(players) < 2:
-        await update.message.reply_text("لازم لاعبين على الأقل 😅")
+        await update.message.reply_text("❌ لازم لاعبين على الاقل")
         return
 
-    await update.message.reply_text("🎮 لعبة الأحكام بدأت!")
-
     chosen = random.choice(players)
-    rule = random.choice(ahkam)
+    hokm = random.choice(ahkam)
 
-    await update.message.reply_text(f"👤 اللاعب: {chosen}\n📜 الحكم: {rule}")
+    await update.message.reply_text(
+        f"🎯 اللاعب: {chosen}\n"
+        f"📜 الحكم: {hokm}"
+    )
 
-# تصفير
-async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    players.clear()
-    await update.message.reply_text("تم تصفير اللاعبين 🔄")
-
+# تشغيل البوت
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("help", help_command))
 app.add_handler(CommandHandler("join", join))
-app.add_handler(CommandHandler("game", game))
-app.add_handler(CommandHandler("reset", reset))
-app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome))
-
-print("Bot is running...")
+app.add_handler(CommandHandler("players", show_players))
+app.add_handler(CommandHandler("ahkam", play_ahkam))
 
 app.run_polling()
